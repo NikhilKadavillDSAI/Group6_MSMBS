@@ -12,13 +12,14 @@
 
 **How to run**: 
 - `pip install -r requirements.txt` 
-- then open and run `analysis.ipynb` top to bottom (give run all)
+- then open and run `analysis.ipynb` top to b ottom (give run all)
 
 ---
 
 ## 2. Part 1 — Parameter analysis function
 **Function**: `analyze_recovery_rates(beta, mu, N, I0, simulation_days)`
-- Brief description of your approach
+- Brief description of your approach: 
+We compare five recovery rates while holding transmission, mortality, population size, and initial infections constant. For each value, the table records the reproduction number, the maximum number infectious at one time, when that maximum occurs, and cumulative deaths at the end of the simulation.
 - Output DataFrame (γ = 0.05–0.25), matching your notebook exactly
 
 ---
@@ -68,3 +69,10 @@ percent increase in recovery rate.
 
 ## 5. Conclusions
 
+Our main takeaways from this assignment: 
+
+- Gamma values have such a crucial role in modelling of model systems. The higher the recovery rate the lower the sick population(I), shorter transmission time therefore reducing exposure and  also lower the number of deaths(D). The effects are seen drastically as calculated above. eg: by increasing gamma by 50%, about 35.8% more of the population can survive.
+
+- As mentioned earlier, whatever can be done in a real world situation to bring down the transmission rate even by a little bit, could mean significant improvement for the health of the populations.
+
+- Some Limitations of this kind of modelling is we assume a lot of things like fixed mortality, age, immunity and a couple of other factors. it would be interesting to see how to apply this idealogy into a more complex system that models the missed factors and see the effects and results we get from there. 

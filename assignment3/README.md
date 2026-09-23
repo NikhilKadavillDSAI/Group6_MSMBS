@@ -55,6 +55,8 @@ A, B, C and E all produce a **50% cancer-like basin** in this model, compared wi
 
 A, B and C disrupt the p53 control system, while E directly forces Growth ON. D has a smaller effect, with 9.38% cancer-like states.
 
+A is the only one that can't be undone upstream. Under B or C, p53 is still intact, so blocking MYC or MDM2 could in principle bring it back. Under A there is nothing left to bring back. This matches real cancer, where TP53 is the most frequently mutated gene. So A is the most dangerous.
+
 ## Q2: Role of the feedback loop
 
 The network contains a feedback loop:

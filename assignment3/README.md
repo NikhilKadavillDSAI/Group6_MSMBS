@@ -27,7 +27,7 @@ Mutations D and E were added to test chronic DNA damage and permanently active g
 
 ### Scenario analysis
 
-For a healthy cell, all networks generally show normal growth without death.
+For a healthy cell, all networks except d generally show normal growth without death. D ends with growth = 0 and death = 1.
 
 For a stressed cell with DNA damage:
 
@@ -35,6 +35,8 @@ For a stressed cell with DNA damage:
 * **A, B, C:** the cell keeps growing instead of dying.
 * **D:** the cell responds normally and dies.
 * **E:** the cell keeps growing because Growth is forced ON.
+
+in the oncogene hijacked scenario all networks finish with growth = 1 and death = 0. D additionally forces dna damage on by design.
 
 ### Cancer-like states
 
@@ -55,7 +57,7 @@ A, B, C and E all produce a **50% cancer-like basin** in this model, compared wi
 
 A, B and C disrupt the p53 control system, while E directly forces Growth ON. D has a smaller effect, with 9.38% cancer-like states.
 
-A is the only one that can't be undone upstream. Under B or C, p53 is still intact, so blocking MYC or MDM2 could in principle bring it back. Under A there is nothing left to bring back. This matches real cancer, where TP53 is the most frequently mutated gene. So A is the most dangerous.
+In A, changing upstream regulators cannot restore p53 because its rule forces it OFF. Under B or C, p53 is still intact, so blocking MYC or MDM2 could in principle bring it back. Under A there is nothing left to bring back. This matches real cancer, where TP53 is the most frequently mutated gene. So A could hypothetically be the most dangerous biologically, but our simulation ranks A B C and E all equally dangerous based on cancer-like basin size.
 
 ## Q2: Role of the feedback loop
 
@@ -64,6 +66,9 @@ The network contains a feedback loop:
 **p53 → MYC → MDM2 → p53**
 
 p53 reduces MYC, MYC increases MDM2, and MDM2 reduces p53.
+
+These two inhibitory links create positive feedback. With DNA damage ON, the loop can reinforce either high p53 activity or high MYC/MDM2 activity, depending on the initial state.
+
 
 Mutations A, B and C break this control system in different ways but produce the same result: **50% cancer-like states**. Mutation E bypasses the loop by forcing Growth ON. Mutation D is outside the loop and has a smaller effect.
 

@@ -1,6 +1,6 @@
 # Assignment 4: large downloaded data and pretrained checkpoints
-assignment 4/data/
-assignment 4/models/
+assignment4/data/
+assignment4/models/
 
 # Python cache
 __pycache__/

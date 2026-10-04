@@ -4,7 +4,7 @@
 
 ### 1. Pathogen infection over 2 hours
 
-The infected region starts on the left side and slowly spreads further into the tissue. As the infection spreads, the cells close to it become more deformed and irregular because their walls get weaker.
+The pathogen (red) sits at the left edge of the tissue. It produces a chemical that diffuses into the neighbouring plant cells, which turn purple as the chemical reaches them (cyan = healthy plant cells, green = second plant cell type, purple = plant cells with pathogen chemical and weakened walls). Within 2 hours the purple region stays mostly in the first column of cells, and the pathogen grows slowly and starts pushing into the left edge. Between T = 0 and T = 30 the cells round off across the whole tissue, including far from the pathogen. This is the mechanics relaxing from the initial layout, not the infection itself.
 
 **T = 0 min**
 
@@ -28,15 +28,23 @@ The infected region starts on the left side and slowly spreads further into the 
 
 ### 2. Cell wall stiffness
 
-A cell's wall starts with stiffness 3. As its chemical level increases, the stiffness is reduced using `stiffness = 3 - chemical level`. The chemical effect is capped, so the stiffness can only decrease to about 1.8. The pathogen cells (`CellType 2`) are different. They do not weaken their own walls. Instead, they keep stiffness at 3, grow larger, and divide when they reach the division threshold.
+A cell's wall starts with stiffness 3. The chemical level is first scaled as `patho_chem_level = Chemical(0) / 0.5` and capped at 1.2. If this level is above 0.1, the stiffness is reduced to `stiffness = 3 - patho_chem_level`, so it can only go down to 1.8. Weakened cells also lose their veto (`SetCellVeto(false)`), which allows their walls to be reorganised. The pathogen cells (`CellType 2`) are different. They do not weaken their own walls. Instead, they keep stiffness at 3, grow larger, and divide when they reach the division threshold.
 
 ### 3. Cell-to-cell transport and feedback
 
 The diffusion coefficient is `0.00001 / stiffness`. So when there is more chemical, the wall gets less stiff, and when the stiffness is lower the chemical diffuses faster. This makes the chemical spread to more cells, which can weaken more walls. It is positive feedback because the chemical helps itself spread more.
 
+```mermaid
+flowchart LR
+    A[More chemical in cell] --> B[Lower wall stiffness]
+    B --> C[Higher diffusion coefficient<br/>0.00001 / stiffness]
+    C --> D[Faster spread to neighbours]
+    D --> A
+```
+
 ### 4. Effect of `rel_cell_div_threshold`
 
-When `rel_cell_div_threshold = 3`, the pathogen has to grow much bigger before it can divide, so the population expands more slowly. When `rel_cell_div_threshold = 1`, it reaches the division condition much sooner, so it divides faster and the pathogen population grows more quickly. In the pictures, by T = 120 the pathogens look almost the same size, but after 5 hours we can clearly see that threshold 1 has produced more pathogen cells.
+When `rel_cell_div_threshold = 3`, the pathogen has to grow much bigger before it can divide, so the population expands more slowly. When `rel_cell_div_threshold = 1`, it reaches the division condition much sooner, so it divides faster and the pathogen population grows more quickly. The default value is 2. By T = 90, the pathogen with threshold 1 has already divided into two cells, while with threshold 3 it is still one cell that has grown larger. After 5 hours the difference is clear: threshold 1 has produced a round colony of many small pathogen cells, while threshold 3 has only a few large ones.
 
 **`rel_cell_div_threshold = 3`**
 
@@ -56,7 +64,7 @@ In the other models we worked with (auxin transport and auxin growth), a cell's 
 
 In the infection model, neighbours can change during the simulation. In `CellHouseKeeping`, healthy cells get `SetCellVeto(true)`, but cells weakened by the pathogen chemical get `SetCellVeto(false)`. In `mesh.cpp`, wall elements can only be reconfigured for cells without a veto. This means wall segments can be moved from one cell to the neighbouring cell. Once the walls are weakened, the borders between cells are no longer fixed. The pathogen keeps growing (`EnlargeTargetArea(2)`) and dividing, so it can push into the weakened tissue and squeeze in between plant cells. That way it can get new neighbours it did not touch at the start, similar to how fungal hyphae grow into real plant tissue.
 
-In our run (see [section 1](#1-pathogen-infection-over-2-hours)), the cells next to the pathogen turn purple as the chemical reaches them, which means their walls are weakened and their veto is off. Between [T = 0](images/infection_t0.png) and [T = 120](images/infection_t120.png), the purple region grows to about two columns of cells, and the pathogen grows and divides into two cells while pushing against the weakened left edge.
+This is visible in our simulations. Within the first 2 hours ([T = 0](images/infection_t0.png), [T = 120](images/infection_t120.png)) the pathogen only presses against the left edge. After 5 hours ([T = 300 comparison](images/threshold_comparison_t300.png), see [section 4](#4-effect-of-rel_cell_div_threshold)), the pathogen has grown into the tissue and the plant cells have been pushed aside and arranged around it. It now borders plant cells that were several cells away from it at the start, so its neighbours have changed. This would not be possible in the other models.
 
 Another difference is that wall stiffness is stored per wall element and per cell side. A wall shared by two cells can have a different stiffness on each side, and `getLengthAndStiffness()` takes the average of both sides when calculating diffusion.
 
@@ -66,7 +74,7 @@ The defense would go in `CellHouseKeeping`, inside the "cell wall weakening happ
 
 ```
 // new parameters
-defense_threshold   // chemical level that switches on the defense (higher than 0.1)
+defense_threshold   // chemical level that switches on the defense (between 0.1 and 1.2)
 defense_stiffness   // wall stiffness of a defended cell (higher than 3)
 
 CellHouseKeeping(c):
@@ -95,22 +103,9 @@ CellHouseKeeping(c):
             SetCellVeto(true)
 ```
 
-Optional extension: with the version above, a cell loses its defense as soon as the chemical drops below the threshold again. To make the defense last, the unused second chemical (`Chemical(1)`) could be used as a defense marker:
+This adds **negative feedback**. The original loop is positive: more chemical → lower stiffness → higher diffusion (`0.00001 / stiffness`) → more spread. The defense turns the middle step around: more chemical → higher stiffness → lower diffusion → slower spread into and through that cell. A rise in chemical now triggers a response that limits further rise.
 
-```
-CellDynamics(c):
-    if c is not pathogen and Chemical(0) is above defense_threshold:
-        build up Chemical(1)
-    else:
-        slowly degrade Chemical(1)
-
-CellHouseKeeping(c):
-    use "Chemical(1) > marker_threshold" as the defense condition
-
-SetCellColor(c):
-    give defended cells their own colour so the barrier is visible
-```
-
+The stiffer walls also have a mechanical effect: they weigh more in the wall length part of the Hamiltonian, so they resist being stretched by the growing pathogen. Setting the veto back to true also stops the pathogen from pushing in between cells, which is how it gained new neighbours in section 5. We would expect the infection to slow down or stop, with a ring of stiff cells forming around it. Because the defense only switches on above the threshold, cells at the front would still be weakened for a short time before they defend. So the positive feedback dominates at low chemical levels and the negative feedback takes over at high levels.
 This adds **negative feedback**. The original loop is positive: more chemical → lower stiffness → higher diffusion (`0.00001 / stiffness`) → more spread. The defense turns the middle step around: more chemical → higher stiffness → lower diffusion → slower spread into and through that cell. A rise in chemical now triggers a response that limits further rise.
 
 The stiffer walls also have a mechanical effect: they weigh more in the wall length part of the Hamiltonian, so they resist being stretched by the growing pathogen. Setting the veto back to true also stops the pathogen from pushing in between cells. We would expect the infection to slow down or stop, with a ring of stiff cells forming around it. Because the defense only switches on above the threshold, cells at the front would still be weakened for a short time before they defend. So the positive feedback dominates at low chemical levels and the negative feedback takes over at high levels.

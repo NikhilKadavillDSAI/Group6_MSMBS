@@ -56,4 +56,4 @@ TODO: Add answer.
 
 ### 6. Plant defense
 
-TODO: Add pseudocode and explain the feedback sign.
+The defense would go in `CellHouseKeeping`, inside the "cell wall weakening happens here" block, for plant cells only (`CellType != 2`). The stiffness is set again for every cell at every step, so the defense check has to come before the weakening rule. Otherwise the weakening would overwrite it.

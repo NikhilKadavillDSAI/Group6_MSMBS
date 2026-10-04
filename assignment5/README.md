@@ -52,7 +52,17 @@ When `rel_cell_div_threshold = 3`, the pathogen has to grow much bigger before i
 
 ### 5. Cell neighbours
 
-TODO: Add answer.
+In the other models we worked with (auxin transport and auxin growth), a cell's neighbours never change. The only way a cell gets a new neighbour is through division. This matches real plants, where cells are glued together by the middle lamella and cannot slide past each other.
+
+In the infection model, neighbours can change during the simulation. In `CellHouseKeeping`, healthy cells get `SetCellVeto(true)`, but cells weakened by the pathogen chemical get `SetCellVeto(false)`. In `mesh.cpp`, wall elements can only be reconfigured for cells without a veto. This means wall segments can be moved from one cell to the neighbouring cell. Once the walls are weakened, the borders between cells are no longer fixed. The pathogen keeps growing (`EnlargeTargetArea(2)`) and dividing, so it can push into the tissue and squeeze in between plant cells. That way it gets new neighbours it did not touch at the start, similar to how fungal hyphae grow into real plant tissue.
+
+In our run, the pathogen at T = 0 only touches the cells at the left edge. By T = 120 it has grown and pushed into the weakened (purple) cells on the left side of the tissue.
+
+![T = 0](images/infection_t0.png)
+
+![T = 120](images/infection_t120.png)
+
+Another difference is that wall stiffness is stored per wall element and per cell side. A wall shared by two cells can have a different stiffness on each side, and `getLengthAndStiffness()` takes the average of both sides when calculating diffusion.
 
 ### 6. Plant defense
 

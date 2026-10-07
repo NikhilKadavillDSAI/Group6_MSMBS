@@ -4,7 +4,7 @@
 ### 1. Pathogen infection over 2 hours
 #### Open pathogen_infection model and run for a duration of 2h. Screenshot initial and every 30 min. Describe how the infected region spreads and how the tissue deform
 
-The pathogen (red) sits at the left edge of the tissue. It produces a chemical that diffuses into the neighbouring plant cells, which turn purple as the chemical reaches them (cyan = healthy plant cells, green = second plant cell type, purple = plant cells with pathogen chemical and weakened walls). Within 2 hours the purple region stays mostly in the first column of cells, and the pathogen grows slowly and starts pushing into the left edge. Between T = 0 and T = 30 the cells round off across the whole tissue, including far from the pathogen. This is the mechanics relaxing from the initial layout, not the infection itself.
+The pathogen (red) sits at the left edge of the tissue. It produces a chemical that diffuses into the neighbouring plant cells, which turn purple as the chemical reaches them (cyan = healthy plant cells, green = second plant cell type, purple = plant cells with pathogen chemical and weakened walls). The first column of cells is already purple at T = 30, the purple region reaches the second column by T = 60, and by T = 120 it covers about 2–3 columns. Meanwhile the pathogen grows slowly and starts pushing into the left edge. Between T = 0 and T = 30 the cells round off across the whole tissue, including far from the pathogen. This is the mechanics relaxing from the initial layout, not the infection itself.
 
 | Color Sample | Cell Type / State | Description |
 | :--- | :--- | :--- |
@@ -41,17 +41,28 @@ flowchart LR
 
 When `rel_cell_div_threshold = 3`, the pathogen has to grow much bigger before it can divide, so the population expands more slowly. When `rel_cell_div_threshold = 1`, it reaches the division condition much sooner, so it divides faster and the pathogen population grows more quickly. The default value is 2. By T = 90, the pathogen with threshold 1 has already divided into two cells, while with threshold 3 it is still one cell that has grown larger. After 5 hours the difference is clear: threshold 1 has produced a round colony of many small pathogen cells, while threshold 3 has only a few large ones.
 
-> ### `rel_cell_div_threshold = 3`
->
-> ![Threshold 3](images/threshold_3_t0_t120.png)
+<p align="center">
+  <img src="images/threshold_comparison_t300.png" alt="Threshold 3 vs threshold 1 at T = 300 min" width="42%"><br>
+  <b>T = 300 min</b>: <code>rel_cell_div_threshold = 3</code> (left) vs <code>rel_cell_div_threshold = 1</code> (right)<br>
+  <sub>Threshold 3 has a few large pathogen cells; threshold 1 has a round colony of many small ones.</sub>
+</p>
 
-> ### `rel_cell_div_threshold = 1`
->
-> ![Threshold 1](images/threshold_1_t0_t120.png)
+<p align="center"><b>Time course (0–120 min)</b></p>
 
-> ### *Comparing final colony size between threshold 3 and threshold 1.*
->
-> ![Threshold comparison at T = 300](images/threshold_comparison_t300.png)
+<table>
+  <tr>
+    <th width="50%"><code>rel_cell_div_threshold = 3</code></th>
+    <th width="50%"><code>rel_cell_div_threshold = 1</code></th>
+  </tr>
+  <tr>
+    <td><img src="images/threshold_3_t0_t120.png" alt="Threshold 3, T = 0 to 120 min" width="100%"></td>
+    <td><img src="images/threshold_1_t0_t120.png" alt="Threshold 1, T = 0 to 120 min" width="100%"></td>
+  </tr>
+  <tr>
+    <td align="center"><sub>Pathogen grows larger but is still one cell at T = 90</sub></td>
+    <td align="center"><sub>Pathogen has already divided into two cells by T = 90</sub></td>
+  </tr>
+</table>
 
 ---
 

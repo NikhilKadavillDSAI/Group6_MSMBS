@@ -3,12 +3,13 @@
 ## Assignment
 
 ### 1. Pathogen infection over 2 hours
+#### Open pathogen_infection model and run for a duration of 2h. Screenshot initial and every 30 min. Describe how the infected region spreads and how the tissue deform
 
 The pathogen (red) sits at the left edge of the tissue. It produces a chemical that diffuses into the neighbouring plant cells, which turn purple as the chemical reaches them (cyan = healthy plant cells, green = second plant cell type, purple = plant cells with pathogen chemical and weakened walls). Within 2 hours the purple region stays mostly in the first column of cells, and the pathogen grows slowly and starts pushing into the left edge. Between T = 0 and T = 30 the cells round off across the whole tissue, including far from the pathogen. This is the mechanics relaxing from the initial layout, not the infection itself.
 
 **T = 0 min**
 
-![T = 0](images/infection_t0.png)
+![T = 0](images/infection_t00.png)
 
 **T = 30 min**
 
@@ -26,12 +27,14 @@ The pathogen (red) sits at the left edge of the tissue. It produces a chemical t
 
 ![T = 120](images/infection_t120.png)
 
+---
 ### 2. Cell wall stiffness
-
+#### In the model files `(Github repo – Models – Infection – infection.cpp9:Read CellHouseKeeping.)` In your own words: how is a cell's wall stiffness reduced as a function of its chemical level? What does the pathogen do differently?
 A cell's wall starts with stiffness 3. The chemical level is first scaled as `patho_chem_level = Chemical(0) / 0.5` and capped at 1.2. If this level is above 0.1, the stiffness is reduced to `stiffness = 3 - patho_chem_level`, so it can only go down to 1.8. Weakened cells also lose their veto (`SetCellVeto(false)`), which allows their walls to be reorganised. The pathogen cells (`CellType 2`) are different. They do not weaken their own walls. Instead, they keep stiffness at 3, grow larger, and divide when they reach the division threshold.
 
+---
 ### 3. Cell-to-cell transport and feedback
-
+#### In the model files `(Github repo – Models – Infection – infection.cpp9: Read CelltoCellTransport)`. How is the diffusion coefficient defined? Explain the feedback loop this creates and sketch it: chemical lowers stiffness, lower stiffness raises diffusion, faster diffusion spreads the chemical. Is this positive or negative feedback?
 The diffusion coefficient is `0.00001 / stiffness`. So when there is more chemical, the wall gets less stiff, and when the stiffness is lower the chemical diffuses faster. This makes the chemical spread to more cells, which can weaken more walls. It is positive feedback because the chemical helps itself spread more.
 
 ```mermaid
@@ -42,7 +45,9 @@ flowchart LR
     D --> A
 ```
 
+---
 ### 4. Effect of `rel_cell_div_threshold`
+#### Raise and lower `rel_cell_div_threshold`. How does it change how fast the pathogen population expands? Document two runs.
 
 When `rel_cell_div_threshold = 3`, the pathogen has to grow much bigger before it can divide, so the population expands more slowly. When `rel_cell_div_threshold = 1`, it reaches the division condition much sooner, so it divides faster and the pathogen population grows more quickly. The default value is 2. By T = 90, the pathogen with threshold 1 has already divided into two cells, while with threshold 3 it is still one cell that has grown larger. After 5 hours the difference is clear: threshold 1 has produced a round colony of many small pathogen cells, while threshold 3 has only a few large ones.
 
@@ -58,7 +63,10 @@ When `rel_cell_div_threshold = 3`, the pathogen has to grow much bigger before i
 
 ![Threshold comparison at T = 300](images/threshold_comparison_t300.png)
 
+---
+
 ### 5. Cell neighbours
+#### What is a fundamental difference regarding cell neighbours in this model compared to all other models that you have worked with so far?
 
 In the other models we worked with (auxin transport and auxin growth), a cell's neighbours never change. The only way a cell gets a new neighbour is through division. This matches real plants, where cells are glued together by the middle lamella and cannot slide past each other.
 
@@ -68,7 +76,9 @@ This is visible in our simulations. Within the first 2 hours ([T = 0](images/inf
 
 Another difference is that wall stiffness is stored per wall element and per cell side. A wall shared by two cells can have a different stiffness on each side, and `getLengthAndStiffness()` takes the average of both sides when calculating diffusion.
 
+---
 ### 6. Plant defense
+#### The plant evolves a defense: cells above a chemical threshold stiffen their walls. Describe in pseudocode where in `CellHouseKeeping` this would go and what sign of feedback it adds. Do not implement it. Pseudocode for the different sections is enough!
 
 The defense would go in `CellHouseKeeping`, inside the "cell wall weakening happens here" block, for plant cells only (`CellType != 2`). The stiffness is set again for every cell at every step, so the defense check has to come before the weakening rule. Otherwise the weakening would overwrite it.
 

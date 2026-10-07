@@ -7,11 +7,11 @@
 The pathogen (red) sits at the left edge of the tissue. It produces a chemical that diffuses into the neighbouring plant cells, which turn purple as the chemical reaches them (cyan = healthy plant cells, green = second plant cell type, purple = plant cells with pathogen chemical and weakened walls). The first column of cells is already purple at T = 30, the purple region reaches the second column by T = 60, and by T = 120 it covers about 2–3 columns. Meanwhile the pathogen grows slowly and starts pushing into the left edge. Between T = 0 and T = 30 the cells round off across the whole tissue, including far from the pathogen. This is the mechanics relaxing from the initial layout, not the infection itself.
 
 | Color Sample | Hex Code | Cell Type / State | Description |
-| :--- | :---: | :--- | :--- |
-| <code style="color:#00FFFF; background-color:#1e1e1e;">█ Cyan</code> | `#00FFFF` | Healthy Plant Cell | Uninfected cell with base wall stiffness (`3.0`) and locked walls (`SetCellVeto(true)`). |
-| <code style="color:#8A2BE2; background-color:#1e1e1e;">█ Purple</code> | `#8A2BE2` | Infected Plant Cell | Contains pathogen chemical; wall stiffness drops (`3.0 - chemical`) and walls unlock (`SetCellVeto(false)`). |
-| <code style="color:#FF0000; background-color:#1e1e1e;">█ Red</code> | `#FF0000` | Pathogen / Wall Nodes | Active pathogen cells and wall vertices; secretes chemical, expands, and divides. |
-| <code style="color:#008000; background-color:#1e1e1e;">█ Green</code> | `#008000` | Cell Wall Borders | Intercellular boundaries; stores per-side stiffness and controls diffusion transport. |
+| :---: | :---: | :--- | :--- |
+| ![#00FFFF](https://img.shields.io/badge/-%20-00FFFF?style=flat-square) | `#00FFFF` | Healthy Plant Cell | Uninfected cell with base wall stiffness (`3.0`) and locked walls (`SetCellVeto(true)`). |
+| ![#8A2BE2](https://img.shields.io/badge/-%20-8A2BE2?style=flat-square) | `#8A2BE2` | Infected Plant Cell | Contains pathogen chemical; wall stiffness drops (`3.0 - chemical`) and walls unlock (`SetCellVeto(false)`). |
+| ![#FF0000](https://img.shields.io/badge/-%20-FF0000?style=flat-square) | `#FF0000` | Pathogen / Wall Nodes | Active pathogen cells and wall vertices; secretes chemical, expands, and divides. |
+| ![#008000](https://img.shields.io/badge/-%20-008000?style=flat-square) | `#008000` | Cell Wall Borders | Intercellular boundaries; stores per-side stiffness and controls diffusion transport. |
 
 
 | T = 0 min | T = 30 min | T = 60 min | T = 90 min | T = 120 min |
